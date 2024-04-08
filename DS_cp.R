@@ -65,6 +65,7 @@ find_best_split <- function(data, target) {
   return(list(feature = best_feature, value = best_value, gini = best_gini))
 }
 
+
 # Function to build decision tree
 build_tree <- function(data, target, max_depth = 10, min_samples_split = 2, current_depth = 0) {
   if (length(unique(data[[target]])) == 1) {
@@ -81,12 +82,18 @@ build_tree <- function(data, target, max_depth = 10, min_samples_split = 2, curr
   
   split <- find_best_split(data, target)
   
-  if (is.null(split$feature)) {
+  if (is.null(split)) {
     return(as.character(as.integer(round(mean(data[[target]])))))
   }
   
+  print(paste("Split Feature:", split$feature))
+  print(paste("Split Value:", split$value))
+  
   left_indices <- which(data[[split$feature]] <= split$value)
   right_indices <- which(data[[split$feature]] > split$value)
+  
+  print(paste("Left Indices:", left_indices))
+  print(paste("Right Indices:", right_indices))
   
   left_data <- data[left_indices, ]
   right_data <- data[right_indices, ]
@@ -99,16 +106,17 @@ build_tree <- function(data, target, max_depth = 10, min_samples_split = 2, curr
   ))
 }
 
+
 # Function to make predictions
 predict_tree <- function(tree, instance) {
   if (is.character(tree)) {
     return(as.integer(tree))
   }
   
-  if (instance[[tree$feature]] <= tree$value) {
-    return(predict_tree(tree$left, instance))
+  if (instance[[tree[["feature"]]]] <= tree[["value"]]) {
+    return(predict_tree(tree[["left"]], instance))
   } else {
-    return(predict_tree(tree$right, instance))
+    return(predict_tree(tree[["right"]], instance))
   }
 }
 
